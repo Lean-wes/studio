@@ -47,32 +47,25 @@ const ROCKET_EMOJI = '🚀';
 const FIRE_EMOJI = '🔥';
 const BOOST_COST = 25;
 
-const AdsenseAd = ({ adSlot, className }: { adSlot: string; className?: string; }) => {
-  useEffect(() => {
-    try {
-      // This tells AdSense to find an ad slot and fill it.
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-    } catch (e: any) {
-      // This error is common in development with React Strict Mode and can be safely ignored.
-      if (!e.message.includes("All 'ins' elements in the DOM with class=adsbygoogle already have ads in them.")) {
-        console.error("Adsense error:", e);
-      }
-    }
-  }, [adSlot]); // Re-run if adSlot changes
+const BannerAdPlaceholder = ({ className }: { className?: string }) => (
+  <div className={cn("flex h-full w-full items-center justify-center rounded-lg bg-black/30 text-muted-foreground", className)}>
+    <p>Banner Ad</p>
+  </div>
+);
 
-  return (
-    <div className={className} style={{ width: '100%', height: '100%' }}>
-        <ins
-          className="adsbygoogle"
-          style={{ display: 'block' }}
-          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // IMPORTANT: Replace with your own publisher ID
-          data-ad-slot={adSlot}
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-        ></ins>
+const InterstitialAdPlaceholder = ({ className }: { className?: string }) => (
+  <div className={cn("flex h-full w-full items-center justify-center rounded-lg bg-black/30 text-muted-foreground", className)}>
+    <p>Interstitial Ad</p>
+  </div>
+);
+
+const RewardedAdPlaceholder = ({ className }: { className?: string }) => (
+    <div className={cn("flex h-full w-full flex-col items-center justify-center rounded-lg bg-black/30 text-muted-foreground", className)}>
+        <Tv className="h-12 w-12" />
+        <p className="mt-2 font-bold">Rewarded Ad</p>
+        <p className="text-xs">Video simulation</p>
     </div>
-  );
-};
+);
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -500,7 +493,7 @@ const StartScreen = ({ onStart, nextReward }: { onStart: () => void; nextReward?
     </Button>
 
     <div className="mt-12 w-full max-w-md p-2 rounded-lg bg-black/20 min-h-[100px] flex items-center justify-center text-muted-foreground text-sm">
-      <AdsenseAd adSlot="YOUR_BANNER_AD_SLOT_ID" />
+      <BannerAdPlaceholder />
     </div>
   </div>
 );
@@ -634,16 +627,15 @@ const RewardedAdDialog = ({ open, onClose }: { open: boolean; onClose: (complete
     return (
         <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(false); }}>
             <DialogContent className="max-w-md w-full bg-[#1a1a2e] border-[#16213e] text-white p-0 overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle className="sr-only">Sponsored Ad</DialogTitle>
+                <DialogHeader className="bg-[#16213e] px-6 py-4">
+                    <DialogTitle className="flex justify-between items-center text-[#e94560] font-bold">
+                        <span><Tv className="inline-block mr-2" /> Sponsored Content</span>
+                        <span>{countdown}s</span>
+                    </DialogTitle>
                     <DialogDescription className="sr-only">Watch an ad to receive a reward.</DialogDescription>
                 </DialogHeader>
-                <div className="bg-[#16213e] px-6 py-4 flex justify-between items-center text-[#e94560] font-bold">
-                    <span><Tv className="inline-block mr-2" /> Sponsored Content</span>
-                    <span>{countdown}s</span>
-                </div>
                 <div className="p-2 min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <AdsenseAd adSlot="YOUR_REWARDED_AD_SLOT_ID" />
+                    <RewardedAdPlaceholder />
                 </div>
                 <div className="p-4 bg-[#16213e] text-center">
                     <Button onClick={() => onClose(true)} disabled={countdown > 0} className="w-full disabled:opacity-50 enabled:bg-[#0f3460]">
@@ -676,7 +668,7 @@ const GameOverDialog = ({ open, score, gems, onRestart, onDoubleRewards }: { ope
                 <Button onClick={onDoubleRewards} size="lg" className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold"><Tv className="w-5 h-5 mr-2"/> Watch Ad to Double Score</Button>
             </div>
              <div className="mt-6 w-full p-2 rounded-lg bg-black/20 min-h-[250px] flex items-center justify-center text-muted-foreground text-sm">
-                <AdsenseAd adSlot="YOUR_INTERSTITIAL_AD_SLOT_ID" />
+                <InterstitialAdPlaceholder />
             </div>
         </DialogContent>
     </Dialog>

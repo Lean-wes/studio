@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "reward-1",
+      "description": "An astronaut floating in space with Earth in the background.",
+      "imageUrl": "https://images.unsplash.com/photo-1712512161920-5619da46f0ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhc3Ryb25hdXQlMjBzcGFjZXxlbnwwfHx8fDE3NzEwOTI0Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "astronaut space"
+    },
+    {
+      "id": "reward-2",
+      "description": "The moon's surface with Earth visible in the dark sky.",
+      "imageUrl": "https://images.unsplash.com/photo-1653491887791-738a0afa9ba9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb29uJTIwZWFydGh8ZW58MHx8fHwxNzcxMTIxNDI1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "moon earth"
+    },
+    {
+      "id": "reward-3",
+      "description": "A rover on the red, dusty surface of Mars.",
+      "imageUrl": "https://images.unsplash.com/photo-1730754089469-779e272db8e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFycyUyMHJvdmVyfGVufDB8fHx8MTc3MTEyMTQyNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mars rover"
+    },
+    {
+      "id": "reward-4",
+      "description": "A vibrant nebula or galaxy in deep space.",
+      "imageUrl": "https://images.unsplash.com/photo-1504812333783-63b845853c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxnYWxheHklMjBuZWJ1bGF8ZW58MHx8fHwxNzcxMDU5MzQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "galaxy nebula"
+    },
+    {
+      "id": "reward-5",
+      "description": "A conceptual image of a black hole or a cosmic anomaly.",
+      "imageUrl": "https://images.unsplash.com/photo-1640984756059-7303641db7cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxibGFjayUyMGhvbGV8ZW58MHx8fHwxNzcxMDk4NDk5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "black hole"
+    }
+  ]
 }

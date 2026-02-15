@@ -566,8 +566,12 @@ const RewardedAdDialog = ({ open, onClose }: { open: boolean; onClose: (complete
     }, [open]);
 
     return (
-        <Dialog open={open}>
+        <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(false); }}>
             <DialogContent className="max-w-md w-full bg-[#1a1a2e] border-[#16213e] text-white p-0 overflow-hidden">
+                <DialogHeader className="sr-only">
+                    <DialogTitle>Sponsored Ad</DialogTitle>
+                    <DialogDescription>This is a simulation. In production, a video ad would be displayed here.</DialogDescription>
+                </DialogHeader>
                 <div className="bg-[#16213e] px-6 py-4 flex justify-between items-center text-[#e94560] font-bold">
                     <span><Tv className="inline-block mr-2" /> Sponsored Ad</span>
                     <span>{countdown}s</span>
@@ -582,9 +586,6 @@ const RewardedAdDialog = ({ open, onClose }: { open: boolean; onClose: (complete
                         {countdown > 0 ? `Claim Reward in ${countdown}` : "Claim Reward"}
                     </Button>
                 </div>
-                <button onClick={() => onClose(false)} className="absolute top-2 right-2 text-gray-500 hover:text-white">
-                    <X />
-                </button>
             </DialogContent>
         </Dialog>
     );

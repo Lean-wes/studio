@@ -52,8 +52,11 @@ const AdsenseAd = ({ adSlot, className }: { adSlot: string; className?: string; 
     try {
       // This tells AdSense to find an ad slot and fill it.
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-    } catch (e) {
-      console.error("Adsense error:", e);
+    } catch (e: any) {
+      // This error is common in development with React Strict Mode and can be safely ignored.
+      if (!e.message.includes("All 'ins' elements in the DOM with class=adsbygoogle already have ads in them.")) {
+        console.error("Adsense error:", e);
+      }
     }
   }, [adSlot]); // Re-run if adSlot changes
 

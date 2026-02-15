@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 type GameState = "start" | "playing" | "reward" | "video" | "gameOver" | "ad";
 
@@ -45,6 +46,30 @@ type Particle = {
 const ROCKET_EMOJI = '🚀';
 const FIRE_EMOJI = '🔥';
 const BOOST_COST = 25;
+
+const AdsenseAd = ({ adSlot, className }: { adSlot: string; className?: string; }) => {
+  useEffect(() => {
+    try {
+      // This tells AdSense to find an ad slot and fill it.
+      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    } catch (e) {
+      console.error("Adsense error:", e);
+    }
+  }, [adSlot]); // Re-run if adSlot changes
+
+  return (
+    <div className={className} style={{ width: '100%', height: '100%' }}>
+        <ins
+          className="adsbygoogle"
+          style={{ display: 'block' }}
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // IMPORTANT: Replace with your own publisher ID
+          data-ad-slot={adSlot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+    </div>
+  );
+};
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -471,8 +496,8 @@ const StartScreen = ({ onStart, nextReward }: { onStart: () => void; nextReward?
       <Play className="mr-2"/> PLAY NOW
     </Button>
 
-    <div className="mt-12 w-full max-w-md p-2 rounded-lg bg-black/20 min-h-[50px] flex items-center justify-center text-muted-foreground text-sm">
-      Banner Ad
+    <div className="mt-12 w-full max-w-md p-2 rounded-lg bg-black/20 min-h-[100px] flex items-center justify-center text-muted-foreground text-sm">
+      <AdsenseAd adSlot="YOUR_BANNER_AD_SLOT_ID" />
     </div>
   </div>
 );
@@ -606,18 +631,16 @@ const RewardedAdDialog = ({ open, onClose }: { open: boolean; onClose: (complete
     return (
         <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(false); }}>
             <DialogContent className="max-w-md w-full bg-[#1a1a2e] border-[#16213e] text-white p-0 overflow-hidden">
-                <DialogHeader className="sr-only">
-                    <DialogTitle>Sponsored Ad</DialogTitle>
-                    <DialogDescription>This is a simulation. In production, a video ad would be displayed here.</DialogDescription>
+                <DialogHeader>
+                    <DialogTitle className="sr-only">Sponsored Ad</DialogTitle>
+                    <DialogDescription className="sr-only">Watch an ad to receive a reward.</DialogDescription>
                 </DialogHeader>
                 <div className="bg-[#16213e] px-6 py-4 flex justify-between items-center text-[#e94560] font-bold">
-                    <span><Tv className="inline-block mr-2" /> Sponsored Ad</span>
+                    <span><Tv className="inline-block mr-2" /> Sponsored Content</span>
                     <span>{countdown}s</span>
                 </div>
-                <div className="p-10 min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <div className="text-6xl mb-4">🏢</div>
-                    <h3 className="text-xl font-bold">Sponsor Advertisement</h3>
-                    <p className="text-muted-foreground">This is a simulation. In production, a video ad would be displayed here.</p>
+                <div className="p-2 min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <AdsenseAd adSlot="YOUR_REWARDED_AD_SLOT_ID" />
                 </div>
                 <div className="p-4 bg-[#16213e] text-center">
                     <Button onClick={() => onClose(true)} disabled={countdown > 0} className="w-full disabled:opacity-50 enabled:bg-[#0f3460]">
@@ -649,8 +672,8 @@ const GameOverDialog = ({ open, score, gems, onRestart, onDoubleRewards }: { ope
                 <Button onClick={onRestart} size="lg"><RotateCw className="w-5 h-5 mr-2"/> Play Again</Button>
                 <Button onClick={onDoubleRewards} size="lg" className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold"><Tv className="w-5 h-5 mr-2"/> Watch Ad to Double Score</Button>
             </div>
-             <div className="mt-6 w-full p-2 rounded-lg bg-black/20 min-h-[50px] flex items-center justify-center text-muted-foreground text-sm">
-              Interstitial Ad Placeholder
+             <div className="mt-6 w-full p-2 rounded-lg bg-black/20 min-h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                <AdsenseAd adSlot="YOUR_INTERSTITIAL_AD_SLOT_ID" />
             </div>
         </DialogContent>
     </Dialog>

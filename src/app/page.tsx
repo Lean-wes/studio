@@ -44,6 +44,7 @@ type Particle = {
 
 const ROCKET_EMOJI = '🚀';
 const FIRE_EMOJI = '🔥';
+const BOOST_COST = 25;
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -184,11 +185,11 @@ export default function Home() {
 
   const createParticles = (x: number, y: number, color: string) => {
     const newParticles: Particle[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 15; i++) {
         newParticles.push({
             x, y,
-            vx: (Math.random() - 0.5) * 4,
-            vy: (Math.random() - 0.5) * 4,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
             life: 1, color
         });
     }
@@ -307,8 +308,8 @@ export default function Home() {
     if (gameState === 'playing') {
       intervalId = setInterval(() => {
         let newVelocityX = 0;
-        if (keys.current['ArrowLeft']) newVelocityX = -8;
-        if (keys.current['ArrowRight']) newVelocityX = 8;
+        if (keys.current['ArrowLeft']) newVelocityX = -12;
+        if (keys.current['ArrowRight']) newVelocityX = 12;
         setPlayer(p => ({ ...p, velocityX: newVelocityX }));
       }, 1000 / 60);
     }
@@ -364,9 +365,21 @@ export default function Home() {
   
   const handleTouchControl = (direction: 'left' | 'right' | 'stop') => {
       let newVelocityX = 0;
-      if (direction === 'left') newVelocityX = -8;
-      if (direction === 'right') newVelocityX = 8;
+      if (direction === 'left') newVelocityX = -12;
+      if (direction === 'right') newVelocityX = 12;
       setPlayer(p => ({ ...p, velocityX: newVelocityX }));
+  };
+
+  const handleBoost = () => {
+    if (gameState === 'playing' && gems >= BOOST_COST) {
+      setGems(prev => {
+        const newGems = prev - BOOST_COST;
+        localStorage.setItem('astroLeapGems', newGems.toString());
+        return newGems;
+      });
+      setPlayer(p => ({ ...p, velocityY: -25 }));
+      createParticles(player.x, player.y, '#f97316');
+    }
   };
 
   return (
@@ -381,11 +394,13 @@ export default function Home() {
       {gameState === "playing" && (
         <GameOverlay 
           score={score} 
-          level={level} 
+          level={level}
+          gems={gems}
           nextRewardDist={rewardData[nextRewardIndex] ? Math.max(0, rewardData[nextRewardIndex].scoreNeeded - score) : 0}
           onLeftPress={() => handleTouchControl('left')}
           onRightPress={() => handleTouchControl('right')}
           onRelease={() => handleTouchControl('stop')}
+          onBoost={handleBoost}
         />
       )}
 
@@ -455,22 +470,38 @@ const StartScreen = ({ onStart, nextReward }: { onStart: () => void; nextReward?
   </div>
 );
 
-const GameOverlay = ({ score, level, nextRewardDist, onLeftPress, onRightPress, onRelease }: { score: number, level: number, nextRewardDist: number, onLeftPress: () => void, onRightPress: () => void, onRelease: () => void }) => (
-  <div className="absolute inset-0 z-10 pointer-events-none">
-      <div className="flex justify-between items-center p-4 text-white">
-          <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full"><span className="text-muted-foreground">Height:</span> {score}m</div>
-          <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full"><span className="text-muted-foreground">Level:</span> {level}</div>
-      </div>
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full text-white">
-          <span className="text-muted-foreground">Next Reward in:</span> {nextRewardDist}m
-      </div>
+const GameOverlay = ({ score, level, gems, nextRewardDist, onLeftPress, onRightPress, onRelease, onBoost }: { score: number, level: number, gems: number, nextRewardDist: number, onLeftPress: () => void, onRightPress: () => void, onRelease: () => void, onBoost: () => void }) => {
+    return (
+        <div className="absolute inset-0 z-10 pointer-events-none">
+            <div className="flex justify-between items-center p-4 text-white">
+                <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full"><span className="text-muted-foreground">Height:</span> {score}m</div>
+                <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2"><Gem className="w-4 h-4 text-yellow-400"/> {gems}</div>
+                <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full"><span className="text-muted-foreground">Level:</span> {level}</div>
+            </div>
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full text-white">
+                <span className="text-muted-foreground">Next Reward in:</span> {nextRewardDist}m
+            </div>
 
-      <div className="absolute bottom-8 left-0 right-0 flex justify-between px-8 pointer-events-auto">
-          <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onLeftPress} onTouchEnd={onRelease} onMouseDown={onLeftPress} onMouseUp={onRelease}><ArrowLeft className="w-10 h-10"/></Button>
-          <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onRightPress} onTouchEnd={onRelease} onMouseDown={onRightPress} onMouseUp={onRelease}><ArrowRight className="w-10 h-10"/></Button>
-      </div>
-  </div>
-);
+            <div className="absolute bottom-8 left-0 right-0 flex justify-around items-center px-8 pointer-events-auto">
+                <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onLeftPress} onTouchEnd={onRelease} onMouseDown={onLeftPress} onMouseUp={onRelease}><ArrowLeft className="w-10 h-10"/></Button>
+                
+                <Button 
+                    onClick={onBoost} 
+                    disabled={gems < BOOST_COST}
+                    className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-lg disabled:opacity-50 disabled:bg-gray-600/80 flex flex-col items-center justify-center ring-2 ring-purple-400/50 hover:ring-purple-300 transition-all transform hover:scale-105"
+                >
+                    <Rocket className="w-8 h-8 mb-1"/>
+                    <span className="text-sm font-semibold">Boost</span>
+                    <div className="text-xs font-bold flex items-center gap-1">
+                        <Gem className="w-3 h-3" /> {BOOST_COST}
+                    </div>
+                </Button>
+
+                <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onRightPress} onTouchEnd={onRelease} onMouseDown={onRightPress} onMouseUp={onRelease}><ArrowRight className="w-10 h-10"/></Button>
+            </div>
+        </div>
+    );
+};
 
 const RewardDialog = ({ open, onOpenChange, reward, onContinue, onWatchAd }: { open: boolean; onOpenChange: (open: boolean) => void; reward: Reward | null; onContinue: () => void; onWatchAd: () => void; }) => {
     if (!reward) return null;

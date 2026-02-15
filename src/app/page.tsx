@@ -59,6 +59,7 @@ export default function Home() {
   const [nextRewardIndex, setNextRewardIndex] = useState(0);
 
   const keys = useRef<{ [key: string]: boolean }>({});
+  const touchState = useRef<{ left: boolean, right: boolean }>({ left: false, right: false });
   const animationFrameId = useRef<number>();
   const lastTime = useRef<number>(0);
   const gameDimensions = useRef({ width: 0, height: 0 });
@@ -308,8 +309,11 @@ export default function Home() {
     if (gameState === 'playing') {
       intervalId = setInterval(() => {
         let newVelocityX = 0;
-        if (keys.current['ArrowLeft']) newVelocityX = -12;
-        if (keys.current['ArrowRight']) newVelocityX = 12;
+        if (keys.current['ArrowRight'] || touchState.current.right) {
+            newVelocityX = 15;
+        } else if (keys.current['ArrowLeft'] || touchState.current.left) {
+            newVelocityX = -15;
+        }
         setPlayer(p => ({ ...p, velocityX: newVelocityX }));
       }, 1000 / 60);
     }
@@ -363,11 +367,13 @@ export default function Home() {
     }
   };
   
-  const handleTouchControl = (direction: 'left' | 'right' | 'stop') => {
-      let newVelocityX = 0;
-      if (direction === 'left') newVelocityX = -12;
-      if (direction === 'right') newVelocityX = 12;
-      setPlayer(p => ({ ...p, velocityX: newVelocityX }));
+  const handleTouch = (direction: 'left' | 'right', state: 'press' | 'release') => {
+    if (direction === 'left') {
+        touchState.current.left = state === 'press';
+    }
+    if (direction === 'right') {
+        touchState.current.right = state === 'press';
+    }
   };
 
   const handleBoost = () => {
@@ -397,9 +403,10 @@ export default function Home() {
           level={level}
           gems={gems}
           nextRewardDist={rewardData[nextRewardIndex] ? Math.max(0, rewardData[nextRewardIndex].scoreNeeded - score) : 0}
-          onLeftPress={() => handleTouchControl('left')}
-          onRightPress={() => handleTouchControl('right')}
-          onRelease={() => handleTouchControl('stop')}
+          onLeftPress={() => handleTouch('left', 'press')}
+          onLeftRelease={() => handleTouch('left', 'release')}
+          onRightPress={() => handleTouch('right', 'press')}
+          onRightRelease={() => handleTouch('right', 'release')}
           onBoost={handleBoost}
         />
       )}
@@ -470,7 +477,7 @@ const StartScreen = ({ onStart, nextReward }: { onStart: () => void; nextReward?
   </div>
 );
 
-const GameOverlay = ({ score, level, gems, nextRewardDist, onLeftPress, onRightPress, onRelease, onBoost }: { score: number, level: number, gems: number, nextRewardDist: number, onLeftPress: () => void, onRightPress: () => void, onRelease: () => void, onBoost: () => void }) => {
+const GameOverlay = ({ score, level, gems, nextRewardDist, onLeftPress, onLeftRelease, onRightPress, onRightRelease, onBoost }: { score: number, level: number, gems: number, nextRewardDist: number, onLeftPress: () => void, onLeftRelease: () => void, onRightPress: () => void, onRightRelease: () => void, onBoost: () => void }) => {
     return (
         <div className="absolute inset-0 z-10 pointer-events-none">
             <div className="flex justify-between items-center p-4 text-white">
@@ -483,7 +490,7 @@ const GameOverlay = ({ score, level, gems, nextRewardDist, onLeftPress, onRightP
             </div>
 
             <div className="absolute bottom-8 left-0 right-0 flex justify-around items-center px-8 pointer-events-auto">
-                <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onLeftPress} onTouchEnd={onRelease} onMouseDown={onLeftPress} onMouseUp={onRelease}><ArrowLeft className="w-10 h-10"/></Button>
+                <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onLeftPress} onTouchEnd={onLeftRelease} onMouseDown={onLeftPress} onMouseUp={onLeftRelease}><ArrowLeft className="w-10 h-10"/></Button>
                 
                 <Button 
                     onClick={onBoost} 
@@ -497,7 +504,7 @@ const GameOverlay = ({ score, level, gems, nextRewardDist, onLeftPress, onRightP
                     </div>
                 </Button>
 
-                <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onRightPress} onTouchEnd={onRelease} onMouseDown={onRightPress} onMouseUp={onRelease}><ArrowRight className="w-10 h-10"/></Button>
+                <Button size="icon" className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md" onTouchStart={onRightPress} onTouchEnd={onRightRelease} onMouseDown={onRightPress} onMouseUp={onRightRelease}><ArrowRight className="w-10 h-10"/></Button>
             </div>
         </div>
     );
